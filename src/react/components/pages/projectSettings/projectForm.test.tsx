@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import MockFactory from "../../../../common/mockFactory";
 import ProjectForm, { IProjectFormProps } from "./projectForm";
+import { KeyCodes } from "../../common/tagsInput/tagsInput";
 
 describe("Project Form Component", () => {
 
@@ -179,6 +180,30 @@ describe("Project Form Component", () => {
             const form = wrapper.find("form");
             form.simulate("submit");
             expect(onSubmit).not.toBeCalled();
+        });
+
+        it("should call onSubmit with new project", () => {
+            const wrapper = createComponent({
+                project: null,
+                connections,
+                onSubmit,
+            });
+            wrapper.find("input#root_name")
+                .simulate("change", { target: { value: project.name }});
+            wrapper.find("textarea#root_description")
+                .simulate("change", { target: { value: project.description }});
+            wrapper.find("select#root_sourceConnectionId")
+                .simulate("change", { target: { value: project.targetConnectionId }});
+            wrapper.find("select#root_targetConnectionId")
+                .simulate("change", { target: { value: project.sourceConnectionId }});
+            for (const tag of project.tags) {
+                wrapper.find("input#ReactTags__tagInputField")
+                    .simulate("change", {target: {value: tag.name}});
+                wrapper.find("input#ReactTags__tagInputField")
+                    .simulate("keyDown", {keyCode: KeyCodes.enter});
+            }
+            wrapper.find("form").simulate("submit");
+            expect(onSubmit).toBeCalled();
         });
     });
 });
