@@ -53,6 +53,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                 tags: normalizedTags,
             },
         };
+        this.onFormChange = this.onFormChange.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onTagsChange = this.onTagsChange.bind(this);
     }
@@ -64,6 +65,7 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
                 schema={this.state.formSchema}
                 uiSchema={this.state.uiSchema}
                 formData={this.state.formData}
+                onChange={this.onFormChange}
                 onSubmit={this.onFormSubmit}>
             </Form>
         );
@@ -92,16 +94,32 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
      * @param tagsJson - Stringified tags array
      */
     private onTagsChange(tagsJson: string) {
-        this.setState({
-            formData: {
-                ...this.state.formData,
-                tags: tagsJson,
-            },
+        this.setState((prevState) => {
+            return {
+                formData: {
+                    ...prevState.formData,
+                    tags: tagsJson,
+                },
+            };
         });
     }
 
-    private onFormSubmit(args) {
-        this.props.onSubmit(args.formData);
+    /**
+     * Called whenever there is a change to one of the fields
+     * @param state Current state of project form
+     */
+    private onFormChange(state: IProjectFormState) {
+        this.setState({
+            formData: state.formData,
+        });
+    }
+
+    /**
+     * Called whenever form is submitted
+     * @param state Current state of project form
+     */
+    private onFormSubmit(state: IProjectFormState) {
+        this.props.onSubmit(state.formData);
     }
 
     /**
