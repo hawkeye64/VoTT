@@ -75,7 +75,7 @@ export default class TagsInput extends React.Component<ITagsInputProps, ITagsInp
         );
     }
 
-    public handleEditedTag(newTag: ITag): void {
+    private handleEditedTag(newTag: ITag): void {
         const newReactTag = this.toReactTag(newTag);
         if (newReactTag.id !== this.state.selectedTag.id && this.state.tags.some((t) => t.id === newReactTag.id)) {
             return;
@@ -111,7 +111,7 @@ export default class TagsInput extends React.Component<ITagsInputProps, ITagsInp
         }, () => this.props.onChange(this.normalize(this.state.tags)));
     }
 
-    private handleTagClick(event) {
+    private handleTagClick(event: any): void {
         let text = event.currentTarget.innerText;
         if (!text) {
             text = event.target.innerText;
@@ -157,7 +157,7 @@ export default class TagsInput extends React.Component<ITagsInputProps, ITagsInp
         tag.text = this.ReactTagHtml(tag.id, tag.color);
     }
 
-    private getReactTags(props): IReactTag[] {
+    private getReactTags(props: ITagsInputProps): IReactTag[] {
         const tags = props.tags;
         const iTags = (typeof tags === "string") ? JSON.parse(tags) : tags;
         return (iTags) ? iTags.map((element: ITag) => this.toReactTag(element)) : [];
@@ -174,7 +174,8 @@ export default class TagsInput extends React.Component<ITagsInputProps, ITagsInp
         };
     }
 
-    private ReactTagHtml(name: string, color: string) {
+    private ReactTagHtml(name: string, color: string):
+            React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
         return <div className="inline-block tagtext" onDoubleClick={(event) => this.handleTagClick(event)}>
                     <div className={"inline-block tag_color_box"}
                         style={{
@@ -194,7 +195,7 @@ export default class TagsInput extends React.Component<ITagsInputProps, ITagsInp
         };
     }
 
-    private normalize(tags): string {
+    private normalize(tags: IReactTag[]): string {
         const itags = tags.map((element: IReactTag) => this.toItag(element));
         return JSON.stringify(itags);
     }
