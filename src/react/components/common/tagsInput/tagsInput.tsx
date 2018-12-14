@@ -27,7 +27,7 @@ interface ITagsInputState {
     showModal: boolean;
 }
 
-const KeyCodes = {
+export const KeyCodes = {
     comma: 188,
     enter: 13,
     backspace: 8,
