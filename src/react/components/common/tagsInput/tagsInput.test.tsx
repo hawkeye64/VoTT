@@ -1,7 +1,7 @@
 import { mount } from "enzyme";
 import React from "react";
 import MockFactory from "../../../../common/mockFactory";
-import TagsInput, { KeyCodes } from "./tagsInput";
+import TagsInput, { KeyCodes, ITagsInputProps } from "./tagsInput";
 // tslint:disable-next-line:no-var-requires
 const TagColors = require("./tagColors.json");
 
@@ -11,13 +11,18 @@ describe("Tags Input Component", () => {
 
     const originalTags = MockFactory.createTestTags();
 
+    function createComponent(props: ITagsInputProps) {
+        return mount(
+            <TagsInput {...props}/>,
+        );
+    }
+
     beforeEach(() => {
         onChangeHandler = jest.fn();
-        wrapper = mount(
-            <TagsInput
-                tags={originalTags}
-                onChange={onChangeHandler}/>,
-        );
+        wrapper = createComponent({
+            tags: originalTags,
+            onChange: onChangeHandler,
+        });
     });
 
     it("tags are initialized correctly", () => {

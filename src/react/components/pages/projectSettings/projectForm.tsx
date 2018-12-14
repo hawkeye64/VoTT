@@ -1,26 +1,41 @@
+import deepmerge from "deepmerge";
 import React from "react";
 import Form from "react-jsonschema-form";
-import deepmerge from "deepmerge";
-import TagsInput from "../../common/tagsInput/tagsInput";
+import { IConnection, IProject } from "../../../../models/applicationState.js";
 import ConnectionPicker from "../../common/connectionPicker";
-import { IProject, IConnection } from "../../../../models/applicationState.js";
+import TagsInput from "../../common/tagsInput/tagsInput";
 // tslint:disable-next-line:no-var-requires
 const formSchema = require("./projectForm.json");
 // tslint:disable-next-line:no-var-requires
 const uiSchema = require("./projectForm.ui.json");
 
+/**
+ * Required properties for Project Settings form
+ * project: IProject - project to fill form
+ * connections: IConnection[] - array of connections to use in project
+ * onSubmit: function to call on form submit
+ */
 export interface IProjectFormProps extends React.Props<ProjectForm> {
     project: IProject;
     connections: IConnection[];
     onSubmit: (project: IProject) => void;
 }
 
+/**
+ * Project Form State
+ * formData - data containing details of project
+ * formSchema - json schema of form
+ * uiSchema - json UI schema of form
+ */
 export interface IProjectFormState {
     formData: any;
     formSchema: any;
     uiSchema: any;
 }
 
+/**
+ * Form for editing or creating VoTT projects
+ */
 export default class ProjectForm extends React.Component<IProjectFormProps, IProjectFormState> {
     private widgets = {
         connectionPicker: ConnectionPicker,
@@ -42,6 +57,22 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         this.onTagsChange = this.onTagsChange.bind(this);
     }
 
+    public render() {
+        return (
+            <Form
+                widgets={this.widgets}
+                schema={this.state.formSchema}
+                uiSchema={this.state.uiSchema}
+                formData={this.state.formData}
+                onSubmit={this.onFormSubmit}>
+            </Form>
+        );
+    }
+
+    /**
+     * Updates state if project from properties has changed
+     * @param prevProps - previously set properties
+     */
     public componentDidUpdate(prevProps) {
         if (prevProps.project !== this.props.project) {
             this.setState({
@@ -56,19 +87,11 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         }
     }
 
-    public render() {
-        return (
-            <Form
-                widgets={this.widgets}
-                schema={this.state.formSchema}
-                uiSchema={this.state.uiSchema}
-                formData={this.state.formData}
-                onSubmit={this.onFormSubmit}>
-            </Form>
-        );
-    }
-
-    private onTagsChange(tagsJson) {
+    /**
+     * Called when tags input component changes tags
+     * @param tagsJson - Stringified tags array
+     */
+    private onTagsChange(tagsJson: string) {
         this.setState({
             formData: {
                 ...this.state.formData,
@@ -81,6 +104,9 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         this.props.onSubmit(args.formData);
     }
 
+    /**
+     * Dynamically create UI schema for custom components/pickers
+     */
     private createUiSchema(): any {
         const overrideUiSchema = {
             sourceConnectionId: {
@@ -107,6 +133,10 @@ export default class ProjectForm extends React.Component<IProjectFormProps, IPro
         return deepmerge(uiSchema, overrideUiSchema);
     }
 
+    /**
+     * Return stringified tags if project and project.tags are not null
+     * @param project project containing tags
+     */
     private normalizeTags(project: IProject) {
         if (project && project.tags) {
             return JSON.stringify(project.tags);
